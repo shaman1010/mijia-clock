@@ -1,0 +1,42 @@
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+    z-index: 1000;
+}
+   
+.popup h2 {
+    margin: 0;
+}
+   
+.popup p {
+    margin: 20px 0;
+}
+   
+.popup input, .popup select, .popup textarea {
+    width: 100%;
+    margin-bottom: 20px;
+}
+   
+.popup button {
+    display: block;
+    margin: 0 auto;
+}
+   
+.popup button:hover {
+    background-color: lightgray;
+}
+   
+.popup button:active {
+    background-color: darkgray;
+}
+   
+.popup button:focus {
+    outline: none;
+}
+   

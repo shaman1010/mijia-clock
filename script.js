@@ -1,5 +1,6 @@
 import { LYWSD02MMC } from './devices/lywsd02mmc.js';
 import { LYWSDCGQ_01ZM } from './devices/lywsdcgq.js';
+import { CometBlue } from './devices/cometblue.js';
 import { BTLEDevice } from './btle_device.js';
 import { cap } from './capabilities-control.js';
 
@@ -7,16 +8,19 @@ import { cap } from './capabilities-control.js';
 let mi;
 const logMaxMessages = 10;
 const logMessages = Array(logMaxMessages).fill("");
-const devices = [new LYWSD02MMC(), new LYWSDCGQ_01ZM()];
+const devices = [new LYWSD02MMC(), new LYWSDCGQ_01ZM(), new CometBlue()];
 
 async function connect() {
   log('Connecting to device...'); 
   if (mi && mi.isConnected()) {
     log('Already connected', true);
   } else {
+    const services = devices.map(d => d._requestServices()).flat();
+    services.push(...BTLEDevice.infoServices());
+
     const device = await navigator.bluetooth.requestDevice({
       filters: devices.map(d => d._requestFilter()),
-      optionalServices: devices.map(d => d._requestServices()).flat()
+      optionalServices: services
     });
 
     // add diconnect event listener
@@ -41,9 +45,14 @@ async function connect() {
 
   await mi.connect();
 
+  const info = await mi.readInfo();
+
   log('OK', true);
   log('Device name: ' + mi.getDeviceName());
   log('Device ID: ' + mi.getDeviceId());
+  Object.entries(info)
+    .filter(([key, value]) => value !== null)
+    .forEach(([key, value]) => log(`${key}: ${value}`));
 }
 
 // Function to update time on the selected Bluetooth device
@@ -122,17 +131,6 @@ document.getElementById('connect-button').addEventListener('click', async () => 
 document.getElementById('disconnect-button').addEventListener('click', async () => { 
   await mi.disconnect(); 
 });
-// document.getElementById('update-time-button').addEventListener('click', updateTime);
-// document.getElementById('read-data').addEventListener('click', readData);
-// on unit radiobuton change
-// document.getElementsByName('unit').forEach(radio => {
-//   radio.addEventListener('change', async () => {
-//     await connect();
-//     log('Changing unit...');
-//     await mi.setTempUnit(radio.value);
-//     log('OK', true);
-//   });
-// });
 
 checkCompatibility();
 

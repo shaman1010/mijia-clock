@@ -53,4 +53,3 @@ export class LYWSDCGQ_01ZM extends BTLEDevice {
         return {'batt': value.getUint8(0)};
     }
 }
-

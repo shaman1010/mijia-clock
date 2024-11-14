@@ -1,3 +1,14 @@
+const SERVICE_DEVICE_INFO_UUID = '0000180a-0000-1000-8000-00805f9b34fb';
+
+const CH_MANUFACTURER_NAME_UUID = '00002a29-0000-1000-8000-00805f9b34fb';
+const CH_MODEL_NUMBER_UUID = '00002a24-0000-1000-8000-00805f9b34fb';
+// const CH_SERIAL_NUMBER_UUID = '00002a25-0000-1000-8000-00805f9b34fb'; // blacklisted
+const CH_FIRMWARE_REVISION_UUID = '00002a26-0000-1000-8000-00805f9b34fb';
+const CH_HARDWARE_REVISION_UUID = '00002a27-0000-1000-8000-00805f9b34fb';
+const CH_SOFTWARE_REVISION_UUID = '00002a28-0000-1000-8000-00805f9b34fb';
+const CH_SYSTEM_ID_UUID = '00002a23-0000-1000-8000-00805f9b34fb';
+
+
 export class BTLEDevice {
 
     constructor(device) {
@@ -75,6 +86,28 @@ export class BTLEDevice {
         return this.device.id;
     }
 
+    static infoServices() {
+        return [SERVICE_DEVICE_INFO_UUID];
+    }
+
+    async readInfo() {
+        const manufacturer = await this._getCharacteristicValue(SERVICE_DEVICE_INFO_UUID, CH_MANUFACTURER_NAME_UUID);
+        const model = await this._getCharacteristicValue(SERVICE_DEVICE_INFO_UUID, CH_MODEL_NUMBER_UUID);
+        const firmware = await this._getCharacteristicValue(SERVICE_DEVICE_INFO_UUID, CH_FIRMWARE_REVISION_UUID);
+        const hardware = await this._getCharacteristicValue(SERVICE_DEVICE_INFO_UUID, CH_HARDWARE_REVISION_UUID);
+        const software = await this._getCharacteristicValue(SERVICE_DEVICE_INFO_UUID, CH_SOFTWARE_REVISION_UUID);
+        const systemId = await this._getCharacteristicValue(SERVICE_DEVICE_INFO_UUID, CH_SYSTEM_ID_UUID);
+
+        return {
+            'Manufacturer Name': manufacturer ? new TextDecoder().decode(manufacturer) : null,
+            'Model Number': model ? new TextDecoder().decode(model) : null,
+            'Firmware Revision': firmware ? new TextDecoder().decode(firmware) : null,
+            'Hardware Revision': hardware ? new TextDecoder().decode(hardware) : null,
+            'Software Revision': software ? new TextDecoder().decode(software) : null,
+            'System ID': systemId ? new TextDecoder().decode(systemId) : null
+        };
+    }
+
     async _getCharacteristics(serviceUuid, characteristicUuid) {
         if (!this.server || !this.server.connected) {
             throw new Error('Not connected');
@@ -90,13 +123,23 @@ export class BTLEDevice {
     }
 
     async _getCharacteristicValue(serviceUuid, characteristicUuid) {
-        const characteristic = await this._getCharacteristics(serviceUuid, characteristicUuid);
-        return await characteristic.readValue();
+        try {
+            const characteristic = await this._getCharacteristics(serviceUuid, characteristicUuid);
+            return await characteristic.readValue();
+        } catch (error) {
+            console.error('Failed to read characteristic value', error);
+            return null;
+        }
     }
 
     async _setCharacteristicValue(serviceUuid, characteristicUuid, value) {
-        const characteristic = await this._getCharacteristics(serviceUuid, characteristicUuid);
-        return await characteristic.writeValue(value);
+        try {
+            const characteristic = await this._getCharacteristics(serviceUuid, characteristicUuid);
+            return await characteristic.writeValue(value);
+        } catch (error) {
+            console.error('Failed to write characteristic value', error);
+            return null;
+        }
     }
 
     async _getNotifiedValue(serviceUuid, characteristicUuid) {
@@ -135,8 +178,7 @@ export class BTLEDevice {
         characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
         characteristic.startNotifications();
 
-        return emitter;
-        
+        return emitter;   
     }
 
 }

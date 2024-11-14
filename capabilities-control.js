@@ -1,3 +1,5 @@
+import { popupDatetime, popupString, popupEnum, popupNumber } from './popup.js';
+
 
 export function cap(dev, capabilities) {
     const read = capabilities.read || {};
@@ -60,41 +62,30 @@ function createWriteItem(dev, key, item) {
     button.innerText = item.name;
     button.onclick = async () => {
         // pop up a prompt to get the value
+        const setValue = async (v) => {
+            if(v === null) {
+                return;
+            }
+
+            try {
+                await dev[key](v);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+
         let value = null;
         if (item.type === 'Date') {
-            value = new Date();
+            popupDatetime(item.name, item.name, new Date(), setValue);
         } else if (item.type === 'enum') {
-            value = prompt(item.name, item.values[0]);
+            popupEnum(item.name, item.name, item.values, item.values[0], setValue);
+        } else if (item.type === 'number') {
+            popupNumber(item.name, item.name, 0, setValue);
         } else {
-            value = prompt(item.name);
-        }
-        if (value === null) {
-            return;
-        }
-
-        try {
-            await dev[key](value);
-        } catch (error) {
-            console.error(error);
+            popupString(item.name, item.name, '', setValue);
         }
     };
     div.appendChild(button);
     return div;
 }
-
-
-
-// example of capabilities object:
-// {
-//     read: {
-//         'getTime': {'time': { name: 'Time', type: 'Date'}},
-//         'getTempAndHum': {'temp': { name: 'Teperature', type: 'Number', unit: '°C'}, 'hum': {name: 'Humidity', type: 'Number', unit: '%'}},
-//         'getBattery': { 'batt': 'Battery', output: 'Number', unit: '%' },
-//         'getTempUnit': { 'tunit': 'Temperature Unit', output: 'enum', values: ['C', 'F']}
-//     },
-//     write: {
-//         'setTime': { name: 'Time', input: 'Date'},
-//         'setTempUnit': { name: 'Temperature Unit', input: 'enum', values: ['C', 'F']},
-//     },
-// }
-//

@@ -60,12 +60,18 @@ export class LYWSD02MMC extends BTLEDevice {
             time = Date.now();
         }
 
-        const date = new Date(time);
+        if (!(time instanceof Date)) {
+            time = new Date(time);
+        }
 
-        const timeBytes = new Uint8Array([
-            ...new Uint32Array([time / 1000]).subarray(0, 1),
-            date.getTimezoneOffset() / -60
-        ]);
+        const timestamp = Math.floor(time.getTime() / 1000);
+        const tzOffset = time.getTimezoneOffset() / -60;
+
+        const timeBytes = new Uint8Array(5);
+        const timestampBytes = new Uint32Array([timestamp]);
+
+        timeBytes.set(new Uint8Array(timestampBytes.buffer), 0);
+        timeBytes[4] = tzOffset;
 
         return await this._setCharacteristicValue(SERVICE_UUID, CH_TIMESTAMP, timeBytes);
     }
