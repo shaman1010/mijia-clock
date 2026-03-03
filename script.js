@@ -19,7 +19,7 @@ async function connect() {
     services.push(...BTLEDevice.infoServices());
 
     const device = await navigator.bluetooth.requestDevice({
-      filters: devices.map(d => d._requestFilter()),
+      
       optionalServices: services
     });
 
