@@ -6,4 +6,4 @@ Supported devices:
 * [Xiaomi Temperature and Humidity Monitor Sensor LYWSD02MMC](https://www.mi.com/global/product/xiaomi-temperature-and-humidity-monitor-clock/)
 * Xiaomi MiJia LYWSDCGQ/01ZM
 
-Go to [Online Xiaomi clock setup](https://jhkst.github.io/mijia-clock/) and setup time without any application
+Go to [Online Xiaomi clock setup](https://shaman1010.github.io/mijia-clock/) and setup time without any application
