@@ -1,7 +1,7 @@
 import { BTLEDevice } from '../btle_device.js';
 
 
-const DEVICE_NAME = 'LYWSD02';
+const DEVICE_NAME = 'LYWSD02MMC';
 const SERVICE_UUID = 'ebe0ccb0-7a0a-4b0c-8a1a-6ff2997da3a6';
 const CH_TIMESTAMP = 'ebe0ccb7-7a0a-4b0c-8a1a-6ff2997da3a6';       // (RW) Timestamp
 const CH_TEMP_HUM = 'ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6';        // (RN) Temperature, Humidity and Battery voltage
